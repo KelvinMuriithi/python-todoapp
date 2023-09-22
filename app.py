@@ -21,15 +21,51 @@ db.init_app(app)
 @app.route('/tasks',methods=['POST'])
 def tasks():
      if request.method =='POST':
-          newTodo = Todo(task_title ='Learn python', task_description = '', task_status = 'Complete')
+          newTodo = Todo(task_title ='Do Laundry', task_description = '', task_status = 'InComplete')
           db.session.add(newTodo)
           db.session.commit()
-          return jsonify(newTodo)
-          
+          return jsonify({'message': 'Task updated successfully', 'task': {
+               'id': newTodo.id,
+               'task_title': newTodo.task_title,
+               'task_description': newTodo.task_description,
+               'task_status': newTodo.task_status
+               }})
+
+# update
+@app.route('/update/<int:task_id>', methods=['PUT'])
+def update_tasks(task_id):
+     if request.method == 'PUT':
+          updateTask = Todo.query.get(task_id)
+          if updateTask is None:
+           return jsonify({'message': 'Task not found'}), 404
+      
+          data = request.json
+          updateTask.task_title = data.get('task_title', updateTask.task_title)
+          updateTask.task_description = data.get('task_description', updateTask.task_description)
+          updateTask.task_status = data.get('task_status', updateTask.task_status)
+
+
+          db.session.commit()
+          return jsonify({'message': 'Task updated successfully', 'task': {
+          'id': updateTask.id,
+          'task_title': updateTask.task_title,
+          'task_description': updateTask.task_description,
+          'task_status': updateTask.task_status
+          }})
+
+      
+      
+
+
+    
 
 
 
 
 
-if __name__ == '__main__':  
-     app.run()
+
+
+
+
+       
+
